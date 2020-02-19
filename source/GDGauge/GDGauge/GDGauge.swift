@@ -9,7 +9,6 @@ import UIKit
 
 public final class GDGaugeView: UIView {
     fileprivate var baseCircleShape: CAShapeLayer?
-    fileprivate var handleShape: CAShapeLayer!
     fileprivate var calculatedStartDegree: CGFloat = 0.0
     fileprivate var calculatedEndDegree: CGFloat = 0.0
     fileprivate var displayLink: CADisplayLink?
@@ -19,10 +18,12 @@ public final class GDGaugeView: UIView {
     fileprivate var firstIndicatorsSerie: [CAShapeLayer] = []
     fileprivate var secondIndicatorsSerie: [CAShapeLayer] = []
 
+    public var handleShape: CAShapeLayer!
     public var unitImage: UIImage? = nil
     public var unitImageTint: UIColor = UIColor.black
     public var showBorder: Bool = true
     public var fullBorder: Bool = false
+    public var addGaugeValueLabels: Bool = true
     public var startDegree: CGFloat = 45.0
     public var endDegree: CGFloat = 315.0
     public var stepValue: CGFloat = 20
@@ -106,40 +107,10 @@ public final class GDGaugeView: UIView {
     }
     
     private func drawHandle(){
-        handleShape = CAShapeLayer()
+        if handleShape == nil {
+            handleShape = CAShapeLayer()
+        }
         handleShape?.fillColor = handleColor.cgColor
-        
-        let baseRad = degreeToRadian(degree: finalValue)
-        let leftAngle = degreeToRadian(degree: 90 + finalValue)
-        let rightAngle = degreeToRadian(degree: -90 + finalValue)
-        
-        let startVal = frame.width / 4
-        let length = CGFloat(5)
-        let endVal = startVal + length
-        let centerPoint = CGPoint(x: frame.width / 2, y: frame.height / 2)
-        let endPoint = CGPoint(x: cos(-baseRad) * endVal + centerPoint.x, y: sin(-baseRad) * endVal + centerPoint.y)
-        let rightPoint = CGPoint(x: cos(-leftAngle) * CGFloat(15) + centerPoint.x, y: sin(-leftAngle) * CGFloat(15) + centerPoint.y)
-        let leftPoint = CGPoint(x: cos(-rightAngle) * CGFloat(15) + centerPoint.x, y: sin(-rightAngle) * CGFloat(15) + centerPoint.y)
-        
-        let handlePath = UIBezierPath()
-        handlePath.move(to: rightPoint)
-        
-        let midx = rightPoint.x + ((leftPoint.x - rightPoint.x) / 2)
-        let midy = rightPoint.y + ((leftPoint.y - rightPoint.y) / 2)
-        let diffx = midx - rightPoint.x
-        let diffy = midy - rightPoint.y
-        let angle = (atan2(diffy, diffx) * CGFloat((180 / Double.pi))) - 90
-        let targetRad = degreeToRadian(degree: angle)
-        let newX = midx - 20 * cos(targetRad)
-        let newY = midy - 20 * sin(targetRad)
-        
-        handlePath.addQuadCurve(to: leftPoint, controlPoint: CGPoint(x: newX, y: newY))
-        handlePath.addLine(to: endPoint)
-        handlePath.addLine(to: rightPoint)
-        
-        handleShape?.path = handlePath.cgPath
-        handleShape?.anchorPoint = centerPoint
-        handleShape?.path = handlePath.cgPath
         layer.addSublayer(handleShape)
         
         absStartTime = CFAbsoluteTimeGetCurrent()
@@ -148,10 +119,12 @@ public final class GDGaugeView: UIView {
     }
     
     @objc func updateHandle(_ sender: CADisplayLink){
+        // rotate
+//        handleShape.transform = CATransform3DRotate(CATransform3DIdentity, degreeToRadian(degree: currentValue), 0, 0, 1.0)
         let baseRad = degreeToRadian(degree: finalValue)
         let leftAngle = degreeToRadian(degree: 90 + finalValue)
         let rightAngle = degreeToRadian(degree: -90 + finalValue)
-        
+
         let startVal = frame.width / 4
         let length = CGFloat(5)
         let endVal = startVal + length
@@ -159,10 +132,10 @@ public final class GDGaugeView: UIView {
         let endPoint = CGPoint(x: cos(-baseRad) * endVal + centerPoint.x, y: sin(-baseRad) * endVal + centerPoint.y)
         let rightPoint = CGPoint(x: cos(-leftAngle) * CGFloat(15) + centerPoint.x, y: sin(-leftAngle) * CGFloat(15) + centerPoint.y)
         let leftPoint = CGPoint(x: cos(-rightAngle) * CGFloat(15) + centerPoint.x, y: sin(-rightAngle) * CGFloat(15) + centerPoint.y)
-        
+
         let handlePath = UIBezierPath()
         handlePath.move(to: rightPoint)
-        
+
         let midx = rightPoint.x + ((leftPoint.x - rightPoint.x) / 2)
         let midy = rightPoint.y + ((leftPoint.y - rightPoint.y) / 2)
         let diffx = midx - rightPoint.x
@@ -171,12 +144,13 @@ public final class GDGaugeView: UIView {
         let targetRad = degreeToRadian(degree: angle)
         let newX = midx - 20 * cos(targetRad)
         let newY = midy - 20 * sin(targetRad)
-        
+
         handlePath.addQuadCurve(to: leftPoint, controlPoint: CGPoint(x: newX, y: newY))
         handlePath.addLine(to: endPoint)
         handlePath.addLine(to: rightPoint)
-        
+
         handleShape?.path = handlePath.cgPath
+        handleShape?.anchorPoint = centerPoint
     }
     
     private func drawPoints(){
@@ -251,6 +225,10 @@ public final class GDGaugeView: UIView {
     }
     
     private func addTexts(centerPoint: CGPoint){
+        addUnit(centerPoint: centerPoint)
+        guard addGaugeValueLabels else {
+            return
+        }
         for i in 0...points{
             let endValue = (frame.width / 3) * 1.03
             
@@ -285,7 +263,6 @@ public final class GDGaugeView: UIView {
             
             layer.addSublayer(textLayer)
         }
-        addUnit(centerPoint: centerPoint)
     }
     
     private func addUnit(centerPoint: CGPoint){
