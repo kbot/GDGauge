@@ -7,11 +7,11 @@ s.license          = 'MIT'
 s.author           = { "Saeid Basirnia" => "saeid.basirniaa@gmail.com" }
 s.source           = { :git => "https://github.com/saeid/GDGauge.git", :tag => "1.1.4"}
 
-s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
+s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5.0' }
 s.platform     = :ios
 s.ios.deployment_target  = '9.0'
 s.requires_arc = true
-s.swift_version = '4.2'
+s.swift_version = '5.0'
 s.source_files = 'source/GDGauge/**/*.{swift}'
 s.frameworks = 'UIKit'
 
