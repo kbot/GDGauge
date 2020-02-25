@@ -25,10 +25,10 @@ public final class GDGaugeView: UIView {
     public var fullBorder: Bool = false
     public var addGaugeValueLabels: Bool = true
     public var startDegree: CGFloat = 45.0
-    public var endDegree: CGFloat = 315.0
-    public var stepValue: CGFloat = 20
+    public var endDegree: CGFloat = 270.0
+    public var stepValue: CGFloat = 10
     public var min: CGFloat = 0
-    public var max: CGFloat = 220
+    public var max: CGFloat = 270
     public var currentValue: CGFloat = 0
     public var baseColor: UIColor = UIColor(red: 0 / 255, green: 72 / 255, blue: 67 / 255, alpha: 1)
     public var handleColor: UIColor = UIColor(red: 0 / 255, green: 98 / 255, blue: 91 / 255, alpha: 1)
@@ -109,6 +109,15 @@ public final class GDGaugeView: UIView {
     private func drawHandle(){
         if handleShape == nil {
             handleShape = CAShapeLayer()
+            let centerPoint = CGPoint(x: frame.width / 2, y: frame.height / 2)
+            let handlePath = UIBezierPath()
+            handlePath.move(to: CGPoint(x: -2, y: frame.width / 3.35))
+            handlePath.addLine(to: CGPoint(x: -2, y: frame.width / 3.35 + 25))
+            handlePath.addLine(to: CGPoint(x: 2, y: frame.width / 3.35 + 25))
+            handlePath.addLine(to: CGPoint(x: 2, y: frame.width / 3.35))
+            handlePath.close()
+            handleShape?.path = handlePath.cgPath
+            handleShape?.position = centerPoint
         }
         handleShape?.fillColor = handleColor.cgColor
         layer.addSublayer(handleShape)
@@ -120,37 +129,7 @@ public final class GDGaugeView: UIView {
     
     @objc func updateHandle(_ sender: CADisplayLink){
         // rotate
-//        handleShape.transform = CATransform3DRotate(CATransform3DIdentity, degreeToRadian(degree: currentValue), 0, 0, 1.0)
-        let baseRad = degreeToRadian(degree: finalValue)
-        let leftAngle = degreeToRadian(degree: 90 + finalValue)
-        let rightAngle = degreeToRadian(degree: -90 + finalValue)
-
-        let startVal = frame.width / 4
-        let length = CGFloat(5)
-        let endVal = startVal + length
-        let centerPoint = CGPoint(x: frame.width / 2, y: frame.height / 2)
-        let endPoint = CGPoint(x: cos(-baseRad) * endVal + centerPoint.x, y: sin(-baseRad) * endVal + centerPoint.y)
-        let rightPoint = CGPoint(x: cos(-leftAngle) * CGFloat(15) + centerPoint.x, y: sin(-leftAngle) * CGFloat(15) + centerPoint.y)
-        let leftPoint = CGPoint(x: cos(-rightAngle) * CGFloat(15) + centerPoint.x, y: sin(-rightAngle) * CGFloat(15) + centerPoint.y)
-
-        let handlePath = UIBezierPath()
-        handlePath.move(to: rightPoint)
-
-        let midx = rightPoint.x + ((leftPoint.x - rightPoint.x) / 2)
-        let midy = rightPoint.y + ((leftPoint.y - rightPoint.y) / 2)
-        let diffx = midx - rightPoint.x
-        let diffy = midy - rightPoint.y
-        let angle = (atan2(diffy, diffx) * CGFloat((180 / Double.pi))) - 90
-        let targetRad = degreeToRadian(degree: angle)
-        let newX = midx - 20 * cos(targetRad)
-        let newY = midy - 20 * sin(targetRad)
-
-        handlePath.addQuadCurve(to: leftPoint, controlPoint: CGPoint(x: newX, y: newY))
-        handlePath.addLine(to: endPoint)
-        handlePath.addLine(to: rightPoint)
-
-        handleShape?.path = handlePath.cgPath
-        handleShape?.anchorPoint = centerPoint
+        handleShape.transform = CATransform3DRotate(CATransform3DIdentity, degreeToRadian(degree: currentValue) + degreeToRadian(degree: startDegree), 0, 0, 1.0)
     }
     
     private func drawPoints(){
