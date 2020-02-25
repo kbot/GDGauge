@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = "GDGauge"
-s.version          = "1.1.4"
+s.version          = "1.1.6"
 s.summary          = "Full Customizable, Beautiful, Easy to use gauge view"
 s.homepage         = "https://github.com/saeid/GDGauge"
 s.license          = 'MIT'
