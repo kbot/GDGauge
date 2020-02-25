@@ -32,6 +32,7 @@ public final class GDGaugeView: UIView {
     public var currentValue: CGFloat = 0
     public var baseColor: UIColor = UIColor(red: 0 / 255, green: 72 / 255, blue: 67 / 255, alpha: 1)
     public var handleColor: UIColor = UIColor(red: 0 / 255, green: 98 / 255, blue: 91 / 255, alpha: 1)
+    public var handleWidth: CGFloat = 2
     public var sepratorColor: UIColor = UIColor(red: 0 / 255, green: 174 / 255, blue: 162 / 255, alpha: 1)
     public var textColor: UIColor = UIColor(red: 0 / 255, green: 0 / 255, blue: 0 / 255, alpha: 1)
     public var unitText: String = "km/h"
@@ -111,10 +112,12 @@ public final class GDGaugeView: UIView {
             handleShape = CAShapeLayer()
             let centerPoint = CGPoint(x: frame.width / 2, y: frame.height / 2)
             let handlePath = UIBezierPath()
-            handlePath.move(to: CGPoint(x: -2, y: frame.width / 3.35))
-            handlePath.addLine(to: CGPoint(x: -2, y: frame.width / 3.35 + 25))
-            handlePath.addLine(to: CGPoint(x: 2, y: frame.width / 3.35 + 25))
-            handlePath.addLine(to: CGPoint(x: 2, y: frame.width / 3.35))
+            let gaugeStart = frame.width / 3.5
+            let gaugeSpan = frame.width * 0.08
+            handlePath.move(to: CGPoint(x: -handleWidth, y: gaugeStart))
+            handlePath.addLine(to: CGPoint(x: -handleWidth, y: gaugeStart + gaugeSpan))
+            handlePath.addLine(to: CGPoint(x: handleWidth, y: gaugeStart + gaugeSpan))
+            handlePath.addLine(to: CGPoint(x: handleWidth, y: gaugeStart))
             handlePath.close()
             handleShape?.path = handlePath.cgPath
             handleShape?.position = centerPoint
